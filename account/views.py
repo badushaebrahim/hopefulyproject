@@ -1,6 +1,9 @@
+from pstats import Stats
 from django.shortcuts import render
 from account.serializer import loginserializer
+from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.views import APIView
 
 # Create your views here.
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -39,11 +42,14 @@ class CustomAuthToken(ObtainAuthToken):
     #     })
     def post(self, request, *args, **kwargs):
         # serializer = loginserializer(data=request.data)
-        print(request.data)
-        userdatas= CustomUser.objects.get(username= request.data['username'])
+        # print(request.data)
+        try:
+            userdatas= CustomUser.objects.get(username= request.data['username'],password = request.data['password'])
+        except CustomUser.DoesNotExist:
+            print("user not found")
+            return Response(status=status.HTTP_404_NOT_FOUND)
         print(type(userdatas))
         serializer = loginserializer(userdatas)
-
         # print(serializer.is_valid())
         # return Response(serializer.data)
 
@@ -62,3 +68,13 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id':serializer.data["id"]
         }
         return Response(status=status.HTTP_200_OK,data=data)
+
+
+class user_Register(APIView):
+    def post(self,request, *args, **kwargs):
+        serial = loginserializer(data=request.data)
+        if serial.is_valid():
+            # serial.create()
+            serial.save()
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
