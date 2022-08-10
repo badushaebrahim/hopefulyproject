@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from account.serializer import loginserializer
 from rest_framework import status
 
 # Create your views here.
@@ -37,13 +38,27 @@ class CustomAuthToken(ObtainAuthToken):
     #         'user_id': user.pk
     #     })
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer(data=request.data,
-                                           context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
+        # serializer = loginserializer(data=request.data)
+        print(request.data)
+        userdatas= CustomUser.objects.get(username= request.data['username'])
+        print(type(userdatas))
+        serializer = loginserializer(userdatas)
+
+        # print(serializer.is_valid())
+        # return Response(serializer.data)
+
+        print("new",serializer.data)
+        # print(serializer.is_valid())
+        # user = serializer.validated_data['username']
+        token, created = Token.objects.get_or_create(user=userdatas)
+        print("-------------------------------------")
+        # return Response({
+        #     'token': token.key,
+        #     'user_id': user.pk,
+        #     'email': user.email
+        # })
+        data= {
             'token': token.key,
-            'user_id': user.pk,
-            'email': user.email
-        })
+            'user_id':serializer.data["id"]
+        }
+        return Response(status=status.HTTP_200_OK,data=data)
