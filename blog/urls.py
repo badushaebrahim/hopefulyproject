@@ -16,11 +16,13 @@ Including another URLconf
 # from django.contrib import admin
 from django.urls import path
 from rest_framework.authtoken import views
-from account.views import CustomAuthToken,user_Register
+from account.views import CustomAuthToken,user_Register,test_auth,user_crud
 from django.contrib import admin
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('apia/', views.obtain_auth_token),
     path('apim/', CustomAuthToken.as_view()),
     path('usereg/', user_Register.as_view()),
+    path('tes/',test_auth),
+    path('user/<int:id>',user_crud.as_view())
 ]

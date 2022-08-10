@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import unique
+from xmlrpc.client import ResponseError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from pytz import timezone
@@ -43,3 +44,5 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.first_name
+
+
